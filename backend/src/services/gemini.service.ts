@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import type { ConversationTurn } from '../models/conversation-turn.js';
 
 // Gemini free tier rate limit for gemini-embedding-001: 100 RPM, 30k TKM, 1K RPD
 const DELAY_BETWEEN_REQUESTS_MS = 700; // Around 85 RPM
@@ -25,7 +26,11 @@ export async function embedBatch(texts: string[]): Promise<number[][]> {
     return embeddings;
 }
 
-export async function* streamAnswer(question: string, context: string): AsyncIterable<string> {
+export async function* streamAnswer(
+    question: string,
+    context: string,
+    history: ConversationTurn[]
+): AsyncIterable<string> {
     const model = getClient().getGenerativeModel({
         model: 'gemini-2.5-flash',
         systemInstruction: `You are a helpful documentation assistant for the Trifork Company.
@@ -35,8 +40,9 @@ export async function* streamAnswer(question: string, context: string): AsyncIte
                             Use markdown where helpful.`,
     });
 
+    const chat = model.startChat({ history });
     const prompt = `Context:\n${context}\n\nQuestion: ${question}`;
-    const result = await model.generateContentStream(prompt);
+    const result = await chat.sendMessageStream(prompt);
 
     for await (const chunk of result.stream) {
         const text = chunk.text();

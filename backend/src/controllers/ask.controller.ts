@@ -1,12 +1,17 @@
 import type { Request, Response } from 'express';
-import { ask } from '../services/ask.service.js';
+import { ask, clearSession } from '../services/ask.service.js';
 import type { SSEEvent } from '../types/sse.js';
 
 export async function handleAsk(req: Request, res: Response): Promise<void> {
-    const { question } = req.body as { question?: string };
+    const { question, sessionId } = req.body as { question?: string; sessionId?: string };
 
     if (!question?.trim()) {
         res.status(400).json({ error: 'Question cannot be empty' });
+        return;
+    }
+
+    if (!sessionId?.trim()) {
+        res.status(400).json({ error: 'sessionId is required' });
         return;
     }
 
@@ -16,7 +21,7 @@ export async function handleAsk(req: Request, res: Response): Promise<void> {
     res.flushHeaders();
 
     try {
-        const { stream, sources } = await ask(question);
+        const { stream, sources } = await ask(question, sessionId);
         let fullAnswer = '';
 
         for await (const chunk of stream) {
@@ -32,6 +37,11 @@ export async function handleAsk(req: Request, res: Response): Promise<void> {
         sendSSE(res, { type: 'error', message });
         res.end();
     }
+}
+
+export function handleClearSession(req: Request, res: Response): void {
+    clearSession(req.params.id);
+    res.json({ cleared: req.params.id });
 }
 
 function sendSSE(res: Response, event: SSEEvent): void {

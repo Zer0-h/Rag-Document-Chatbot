@@ -1,6 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { ChatMessage } from '../models/chat-message';
 
+const SESSION_ID = crypto.randomUUID();
+const API_URL = 'http://localhost:3000';
+
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   private _messages = signal<ChatMessage[]>([]);
@@ -36,10 +39,10 @@ export class ChatService {
     this.abortController = new AbortController();
 
     try {
-      const response = await fetch('http://localhost:3000/ask', {
+      const response = await fetch(`${API_URL}/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
+        body: JSON.stringify({ question, sessionId: SESSION_ID }),
         signal: this.abortController.signal,
       });
 
@@ -105,7 +108,12 @@ export class ChatService {
     }
   }
 
-  clearSession(): void {
+  async clearSession(): Promise<void> {
+    try {
+      await fetch(`${API_URL}/session/${SESSION_ID}`, { method: 'DELETE' });
+    } catch {
+      console.error('Failed to clear session on server');
+    }
     this._messages.set([]);
     this._error.set(null);
   }

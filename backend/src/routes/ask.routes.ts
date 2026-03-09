@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { handleAsk } from '../controllers/ask.controller';
+import { handleAsk, handleClearSession } from '../controllers/ask.controller';
 
 const router = Router();
 
 router.post('/ask', handleAsk);
+router.delete('/session/:id', handleClearSession);
 
 export default router;
