@@ -1,2 +1,3 @@
-# Rag Document Chatbot
+# TODO
+Make a proper README
 

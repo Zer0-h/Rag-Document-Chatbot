@@ -1,0 +1,59 @@
+<div class="app">
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-text">TRIFORK platform docs</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost" (click)="resetSession()">Reset session</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="chat-area">
+    @if (chat.messages().length === 0) {
+    <div class="empty-state">
+      <h2>Ask the Trifork docs</h2>
+      <p>Answers grounded in platform documentation — no hallucinations.</p>
+      <div class="suggestions">
+        @for (q of suggestions; track q) {
+        <button class="suggestion-chip" (click)="send(q)">{{ q }}</button>
+        }
+      </div>
+    </div>
+    } @else {
+    <div class="messages">
+      @for (msg of chat.messages(); track msg.id) {
+      <app-message [message]="msg" />
+      }
+      @if (chat.loading() && chat.messages()[chat.messages().length - 1].role === 'user') {
+      <div class="message">
+        <div class="message-label">▸ trifork</div>
+        <div class="message-bubble">
+          <span class="thinking">
+            <span></span><span></span><span></span>
+          </span>
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    <div #bottom></div>
+  </main>
+
+  @if (chat.error()) {
+  <div class="error-bar">
+    <span>{{ chat.error() }}</span>
+  </div>
+  }
+
+  <footer class="input-bar">
+    <div class="input-inner">
+      <textarea class="input-field" placeholder="Ask a question about the Trifork platform…" [(ngModel)]="input"
+        (keydown)="onKeyDown($event)" [disabled]="chat.loading()" rows="1"></textarea>
+      <button class="send-btn" (click)="send()" [disabled]="chat.loading() || !input.trim()">{{ chat.loading() ? '…' :
+        '↵' }}</button>
+    </div>
+  </footer>
+</div>

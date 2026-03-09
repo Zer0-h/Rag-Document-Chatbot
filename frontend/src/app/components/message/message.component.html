@@ -1,0 +1,23 @@
+<div class="message" [class.message--user]="message.role === 'user'" [class.message--assistant]="message.role === 'assistant'">
+  <div class="message-label">
+    {{ message.role === 'user' ? 'You' : 'Trifork assistant' }}
+  </div>
+  <div class="message-bubble">
+    @if (message.role === 'assistant') {
+      <div class="markdown-body" [innerHTML]="message.content | markdown"></div>
+      @if (message.streaming) {
+        <span class="cursor-blink">█</span>
+      }
+      @if (message.sources?.length) {
+        <div class="sources">
+          <span class="sources-label">sources</span>
+          @for (source of message.sources!; track source) {
+            <span class="source-tag">{{ source }}</span>
+          }
+        </div>
+      }
+    } @else {
+      <p>{{ message.content }}</p>
+    }
+  </div>
+</div>
