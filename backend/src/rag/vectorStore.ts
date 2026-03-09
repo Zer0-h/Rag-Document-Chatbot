@@ -26,7 +26,6 @@ export class VectorStore {
                 new Field('vector', new FixedSizeList(3072, new Field('item', new Float32()))),
             ]);
 
-
             this.table = await db.createEmptyTable(TABLE_NAME, schema);
             this._size = 0;
         }
@@ -49,7 +48,7 @@ export class VectorStore {
         return this.table
             .vectorSearch(queryEmbedding)
             .limit(topK)
-            .toArray() as unknown as DocumentRecord[];
+            .toArray();
     }
 
     isPopulated(): boolean {
