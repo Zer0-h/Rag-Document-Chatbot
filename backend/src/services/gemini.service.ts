@@ -32,7 +32,7 @@ export async function* streamAnswer(
     history: ConversationTurn[]
 ): AsyncIterable<string> {
     const model = getClient().getGenerativeModel({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.1-flash-lite-preview',
         systemInstruction: `You are a helpful documentation assistant for the Trifork Company.
                             Answer questions ONLY based on the provided context.
                             If the context does not contain enough information, say it explicitly, do not try to guess or hallucinate.

@@ -67,7 +67,7 @@ export function spanGenerate(trace: ReturnType<Langfuse['trace']>, question: str
     const inputTokens = Math.ceil((context.length + question.length) / 4);
     const generation = trace.generation({
         name: 'generate',
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.1-flash-lite-preview',
         input: [
             { role: 'user', content: `Context:\n${context}\n\nQuestion: ${question}` },
         ],
